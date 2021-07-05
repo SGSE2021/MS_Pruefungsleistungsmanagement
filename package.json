@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@nuxtjs/axios": "^5.13.6",
+    "vuetify-datetime-picker": "^2.1.1"
+  }
+}
