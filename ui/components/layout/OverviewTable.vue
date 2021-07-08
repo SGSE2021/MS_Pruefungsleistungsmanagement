@@ -65,7 +65,12 @@ import DetailsDialog from "../misc/DetailsDialog.vue";
 import SubmitDialog from "../misc/SubmitDialog.vue";
 import AssessDialog from "../misc/AssessDialog.vue";
 import { API_URL } from "../../env";
-import { IS_RATED } from "../../src/constants";
+import {
+  ASSESS_DIALOG,
+  DETAILS_DIALOG,
+  IS_RATED,
+  SUBMIT_DIALOG
+} from "../../src/constants";
 export default {
   components: { DetailsDialog, SubmitDialog, AssessDialog },
   data: () => ({
@@ -120,9 +125,7 @@ export default {
       }
     },
 
-    async viewDetails(item) {
-      this.detailsIndex = this.assessments.indexOf(item);
-      this.detailsItem = Object.assign({}, item);
+    async fetchData(dialogType) {
       try {
         const { questions } = await this.$axios.$get(
           `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
@@ -142,69 +145,40 @@ export default {
           `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
         );
         this.documents = documents;
-        this.detailsDialog = true;
+        switch (dialogType) {
+          case DETAILS_DIALOG:
+            this.detailsDialog = true;
+            break;
+          case SUBMIT_DIALOG:
+            this.submitDialog = true;
+            break;
+          case ASSESS_DIALOG:
+            this.assessDialog = true;
+            break;
+          default:
+            break;
+        }
       } catch (error) {
         console.error(error);
         this.errorSnackbar = true;
       }
+    },
+    async viewDetails(item) {
+      this.detailsIndex = this.assessments.indexOf(item);
+      this.detailsItem = Object.assign({}, item);
+      this.fetchData(DETAILS_DIALOG);
     },
 
     async submitAssessment(item) {
       this.detailsIndex = this.assessments.indexOf(item);
       this.detailsItem = Object.assign({}, item);
-      try {
-        const { questions } = await this.$axios.$get(
-          `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
-        );
-        this.questions = questions;
-
-        let answersCopy = [];
-        for await (const q of this.questions) {
-          const { answers } = await this.$axios.$get(
-            `${API_URL}/assessments/questions/answers/${q.question_id}`
-          );
-          answersCopy = answersCopy.concat(answers);
-        }
-        this.answers = answersCopy;
-
-        const { documents } = await this.$axios.$get(
-          `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
-        );
-        this.documents = documents;
-        this.submitDialog = true;
-      } catch (error) {
-        console.error(error);
-        this.errorSnackbar = true;
-      }
+      this.fetchData(SUBMIT_DIALOG);
     },
 
     async assessAssessment(item) {
       this.detailsIndex = this.assessments.indexOf(item);
       this.detailsItem = Object.assign({}, item);
-      try {
-        const { questions } = await this.$axios.$get(
-          `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
-        );
-        this.questions = questions;
-
-        let answersCopy = [];
-        for await (const q of this.questions) {
-          const { answers } = await this.$axios.$get(
-            `${API_URL}/assessments/questions/answers/${q.question_id}`
-          );
-          answersCopy = answersCopy.concat(answers);
-        }
-        this.answers = answersCopy;
-
-        const { documents } = await this.$axios.$get(
-          `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
-        );
-        this.documents = documents;
-        this.assessDialog = true;
-      } catch (error) {
-        console.error(error);
-        this.errorSnackbar = true;
-      }
+      this.fetchData(ASSESS_DIALOG);
     },
 
     updateDetailsDialog(dialog) {
