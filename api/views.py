@@ -31,15 +31,22 @@ class Assessment(Resource):
             "topic": str,
             "state": str,
             "is_rated": bool,
-            "max_rating": int,
-            "rating": int,
+            "max_rating": int
         }
         """
         data = request.get_json()
-        query = "INSERT INTO `assessment` (`course_course_id`, `topic`, `state`, `is_rated`, `max_rating`, `rating`) VALUES (:course_course_id, :topic, :state, :is_rated, :max_rating, :rating)"
+        query = "INSERT INTO `assessment` (`course_course_id`, `topic`, `state`, `is_rated`, `max_rating`) VALUES (:course_course_id, :topic, :state, :is_rated, :max_rating)"
+        last_row_id = "SELECT assessment_id FROM `assessment` ORDER BY `assessment_id` DESC LIMIT 1;"
         try:
+
             self.db.connection.execute(sql_text(query), data)
-            return True
+            res = self.db.connection.execute(sql_text(last_row_id))
+            rows = res.fetchall()
+            keys = res.keys()
+            assessment_id = self.db.clean_select_results(rows, keys)
+            return {
+                'assessment_id': assessment_id
+            }
         except:
             return False
 
@@ -110,17 +117,43 @@ class Question(Resource):
             "assessment_assessment_id": int,
             "is_multiple_choice": bool,
             "question": str,
-            "points": int,
-            "answer": str,
+            "points": int
         }
         """
         data = request.get_json()
-        query = "INSERT INTO `question` (`assessment_assessment_id`, `is_multiple_choice`, `question`, `points`, `answer`) VALUES (:assessment_assessment_id, :is_multiple_choice, :question, :points, :answer)"
+        query = "INSERT INTO `question` (`assessment_assessment_id`, `is_multiple_choice`, `question`, `points`) VALUES (:assessment_assessment_id, :is_multiple_choice, :question, :points)"
+        last_row_id = "SELECT question_id FROM `question` ORDER BY `question_id` DESC LIMIT 1;"
         try:
             self.db.connection.execute(sql_text(query), data)
-            return True
+            res = self.db.connection.execute(sql_text(last_row_id))
+            rows = res.fetchall()
+            keys = res.keys()
+            question_id = self.db.clean_select_results(rows, keys)
+            return {
+                'question_id': question_id
+            }
         except:
             return False
+
+
+class AssessmentQuestion(Resource):
+
+    def __init__(self):
+        self.db = Db()
+
+    def get(self, assessment_id):
+        """ Returns questions by assessment ID"""
+        query = "SELECT * FROM question WHERE assessment_assessment_id=%s"
+        data_tuple = (assessment_id)
+        request.args.get("")
+        res = self.db.connection.execute(query, data_tuple)
+        rows = res.fetchall()
+        keys = res.keys()
+        questions = self.db.clean_select_results(rows, keys)
+
+        return {
+            'questions': questions
+        }
 
 
 class SingleQuestion(Resource):
@@ -145,8 +178,9 @@ class SingleQuestion(Resource):
 
     def put(self, question_id):
         data = request.get_json()
-        query = """UPDATE question SET points=%s, answer=%s WHERE question_id=%s"""
-        data_tuple = (data["points"], data["answer"], question_id)
+        query = """UPDATE question SET points=%s, answer=%s, reached_score=%s WHERE question_id=%s"""
+        data_tuple = (data["points"], data["answer"],
+                      data["reached_score"], question_id)
         try:
             self.db.connection.execute(query, data_tuple)
             return True
@@ -192,7 +226,7 @@ class Answer(Resource):
         }
         """
         data = request.get_json()
-        query = "INSERT INTO `question` (`question_question_id`, `answer_text`, `is_correct`, `is_checked`) VALUES (:question_question_id, :answer_text, :is_correct, :is_checked)"
+        query = "INSERT INTO `answer` (`question_question_id`, `answer_text`, `is_correct`, `is_checked`) VALUES (:question_question_id, :answer_text, :is_correct, :is_checked)"
         try:
             self.db.connection.execute(sql_text(query), data)
             return True
@@ -200,8 +234,28 @@ class Answer(Resource):
             return False
 
 
+class QuestionAnswer(Resource):
+
+    def __init__(self):
+        self.db = Db()
+
+    def get(self, question_id):
+        """ Returns answers by question ID"""
+        query = "SELECT * FROM answer WHERE question_question_id=%s"
+        data_tuple = (question_id)
+        request.args.get("")
+        res = self.db.connection.execute(query, data_tuple)
+        rows = res.fetchall()
+        keys = res.keys()
+        answers = self.db.clean_select_results(rows, keys)
+
+        return {
+            'answers': answers
+        }
+
+
 class SingleAnswer(Resource):
-    """ The Single Answer View """
+    """ The Answer View """
 
     def __init__(self):
         self.db = Db()
@@ -222,8 +276,8 @@ class SingleAnswer(Resource):
 
     def put(self, answer_id):
         data = request.get_json()
-        query = """UPDATE answer SET answer_text=%s, is_checked=%s WHERE answer_id=%s"""
-        data_tuple = (data["answer_text"], data["is_checked"], answer_id)
+        query = """UPDATE answer SET is_checked=%s WHERE answer_id=%s"""
+        data_tuple = (data["is_checked"], answer_id)
         try:
             self.db.connection.execute(query, data_tuple)
             return True
@@ -274,6 +328,26 @@ class Document(Resource):
             return True
         except:
             return False
+
+
+class AssessmentDocument(Resource):
+
+    def __init__(self):
+        self.db = Db()
+
+    def get(self, assessment_id):
+        """ Returns documents by assessment ID"""
+        query = "SELECT * FROM document WHERE assessment_assessment_id=%s"
+        data_tuple = (assessment_id)
+        request.args.get("")
+        res = self.db.connection.execute(query, data_tuple)
+        rows = res.fetchall()
+        keys = res.keys()
+        documents = self.db.clean_select_results(rows, keys)
+
+        return {
+            'documents': documents
+        }
 
 
 class SingleDocument(Resource):

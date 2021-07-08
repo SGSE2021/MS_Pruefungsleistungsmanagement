@@ -14,7 +14,7 @@
                     :detailsItem="detailsItem"
                   ></single-assessment-table>
                 </v-col>
-                <v-col cols="12" xs="12">
+                <v-col cols="12" xs="12" v-if="detailsItem.is_rated">
                   <h3>Eingereichte Antworten</h3>
                   <v-list v-for="(question, i) in questions" :key="i">
                     <v-list-item>
@@ -47,8 +47,16 @@
                     </v-list-item>
                   </v-list>
                 </v-col>
-                <v-col cols="12" xs="12">
+                <v-col cols="12" xs="12" v-if="detailsItem.is_rated">
                   <h3>Eingereichte Dokumente</h3>
+                  <v-list v-for="(doc, i) in documents" :key="i">
+                    <v-list-item>
+                      <a :href="doc.doc_data" target="_blank">
+                        <v-icon small>mdi-arrow-collapse-down</v-icon>{{ " " }}
+                        {{ doc.doc_name }}</a
+                      >
+                    </v-list-item>
+                  </v-list>
                 </v-col>
               </v-row>
             </v-container>
@@ -65,68 +73,9 @@ import { API_URL } from "../../env";
 
 export default {
   components: { SingleAssessmentTable },
-  props: ["detailsDialog", "detailsItem"],
-  data: () => ({
-    // questions and answers for test purposes
-    questions: [
-      // {
-      //   question_id: 1,
-      //   question: "Test Question 1",
-      //   is_multiple_choice: true,
-      //   points: 20,
-      //   answer: ""
-      // },
-      // {
-      //   question_id: 2,
-      //   question: "Test Question 2",
-      //   is_multiple_choice: false,
-      //   points: 15,
-      //   answer: "Test Answer"
-      // },
-      // {
-      //   question_id: 3,
-      //   question: "Test Question 3",
-      //   is_multiple_choice: true,
-      //   points: 30,
-      //   answer: ""
-      // }
-    ],
-    answers: [
-      // {
-      //   question_question_id: 1,
-      //   answer_text: "Test answer 1",
-      //   is_correct: true,
-      //   is_checked: false
-      // },
-      // {
-      //   question_question_id: 1,
-      //   answer_text: "Test answer 2",
-      //   is_correct: false,
-      //   is_checked: false
-      // },
-      // {
-      //   question_question_id: 3,
-      //   answer_text: "Test answer 3",
-      //   is_correct: true,
-      //   is_checked: true
-      // }
-    ]
-  }),
-  created() {
-    this.initialize();
-  },
+  props: ["detailsDialog", "detailsItem", "questions", "answers", "documents"],
+  data: () => ({}),
   methods: {
-    async initialize() {
-      try {
-        const { questions } = await this.$axios.$get(
-          `${API_URL}/assessments/questions`
-        );
-        this.questions = questions;
-      } catch (error) {
-        console.error(error);
-        this.errorSnackbar = true;
-      }
-    },
     closeDialog() {
       const closedDialog = false;
       this.$emit("update-details-dialog", closedDialog);

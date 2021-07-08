@@ -18,7 +18,7 @@
             >
             <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn dark text @click="dialog = false">
+              <v-btn dark text @click="save()">
                 Speichern
               </v-btn>
             </v-toolbar-items>
@@ -48,12 +48,17 @@
                       >
                         <v-checkbox
                           :label="`${answer.answer_text}`"
+                          v-model="answer.is_checked"
                         ></v-checkbox>
                       </v-list-item>
                     </v-list>
                   </div>
-                  <div v-if="!question.is_multiple_choice">
-                    <v-textarea outlined placeholder="Antwort eingeben"></v-textarea></div
+                  <div v-else>
+                    <v-textarea
+                      outlined
+                      placeholder="Antwort eingeben"
+                      v-model="question.answer"
+                    ></v-textarea></div
                 ></v-col>
               </v-list-item>
             </v-list>
@@ -65,57 +70,63 @@
 </template>
 
 <script>
+import { API_URL } from "../../env";
 export default {
   components: {},
-  props: ["submitDialog", "detailsItem"],
+  props: ["submitDialog", "detailsItem", "questions", "answers"],
   data: () => ({
-    file: null,
-    // questions and answers for test purposes
-    questions: [
-      {
-        question_id: 1,
-        question: "Test Question 1",
-        is_multiple_choice: true,
-        points: 20,
-        answer: ""
-      },
-      {
-        question_id: 2,
-        question: "Test Question 2",
-        is_multiple_choice: false,
-        points: 15,
-        answer: "Test Answer"
-      },
-      {
-        question_id: 3,
-        question: "Test Question 3",
-        is_multiple_choice: true,
-        points: 30,
-        answer: ""
-      }
-    ],
-    answers: [
-      {
-        question_question_id: 1,
-        answer_text: "Test answer 1",
-        is_correct: true
-      },
-      {
-        question_question_id: 1,
-        answer_text: "Test answer 2",
-        is_correct: false
-      },
-      {
-        question_question_id: 3,
-        answer_text: "Test answer 3",
-        is_correct: true
-      }
-    ]
+    file: null
   }),
   methods: {
     closeDialog() {
       const closedDialog = false;
       this.$emit("update-submit-dialog", closedDialog);
+    },
+    convertToBase64(file) {
+      return new Promise(resolve => {
+        var fileReader = new FileReader();
+        var base64;
+        fileReader.onload = function(fileLoadedEvent) {
+          base64 = fileLoadedEvent.target.result;
+          resolve(base64);
+        };
+        fileReader.readAsDataURL(file);
+      });
+    },
+    async save() {
+      try {
+        if (this.file) {
+          const base64 = await this.convertToBase64(this.file);
+          await this.$axios.$post(`${API_URL}/assessments/documents`, {
+            assessment_assessment_id: this.detailsItem.assessment_id,
+            doc_name: this.file.name,
+            doc_data: base64
+          });
+        }
+        for await (const question of this.questions) {
+          await this.$axios.$put(
+            `${API_URL}/assessments/questions/question/${question.question_id}`,
+            {
+              points: question.points,
+              answer: question.answer,
+              reached_score: 0
+            }
+          );
+        }
+        for await (const answer of this.answers) {
+          if (answer?.answer_id) {
+            await this.$axios.$put(
+              `${API_URL}/assessments/questions/answers/answer/${answer.answer_id}`,
+              {
+                is_checked: answer.is_checked
+              }
+            );
+          }
+        }
+        this.closeDialog();
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };

@@ -15,7 +15,7 @@
           <v-toolbar-title>Aufgaben anlegen</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark text @click="dialog = false">
+            <v-btn dark text @click="save()">
               Speichern
             </v-btn>
           </v-toolbar-items>
@@ -85,27 +85,36 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-snackbar v-model="errorSnackbar">
+      Es fehlen verpflichtende Angaben
+      <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="errorSnackbar = false">
+          Schließen
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-row>
 </template>
 
 <script>
 export default {
-  props: ["createTasksDialog"],
+  props: ["createTasksDialog", "assessmentQuestions", "assessmentAnswers"],
   data: () => ({
+    errorSnackbar: false,
     questions: [
       {
-        question_id: 1,
-        question: "Test Question",
         is_multiple_choice: false,
+        question: "Test Question",
         points: 0,
-        answer: "Test Answer"
+        question_id: 1
       }
     ],
     answers: [
       {
-        question_question_id: 1,
         answer_text: "Test answer",
-        is_correct: true
+        is_correct: true,
+        is_checked: false,
+        question_question_id: 1
       }
     ]
   }),
@@ -117,22 +126,23 @@ export default {
     addTask() {
       let questionsCopy = this.questions;
       questionsCopy.push({
+        is_multiple_choice: false,
+        question: "",
+        points: 0,
+        answer: "",
         question_id: this.questions[this.questions.length - 1]?.question_id
           ? this.questions[this.questions.length - 1].question_id + 1
-          : 1,
-        question: "",
-        is_multiple_choice: false,
-        points: 0,
-        answer: ""
+          : 1
       });
       this.questions = questionsCopy;
     },
     addAnswer(question_id) {
       let answersCopy = this.answers;
       answersCopy.push({
-        question_question_id: question_id,
         answer_text: "",
-        is_correct: false
+        is_correct: false,
+        is_checked: false,
+        question_question_id: question_id
       });
       this.answers = answersCopy;
     },
@@ -154,6 +164,42 @@ export default {
       let answersCopy = this.answers;
       answersCopy.splice(x, 1);
       this.answers = answersCopy;
+    },
+    validateQuestionsAndAnswer() {
+      let valid = true;
+      for (const question of this.questions) {
+        if (question.question === "" || question.question === undefined) {
+          valid = false;
+        } else {
+          valid = valid && true;
+        }
+      }
+
+      for (const answer of this.answers) {
+        const relatedQuestion = this.questions.find(
+          question => question.question_id === answer.question_question_id
+        );
+        if (
+          (answer.answer_text === "" || answer.answer_text === undefined) &&
+          relatedQuestion?.is_multiple_choice
+        ) {
+          valid = false;
+        } else {
+          valid = valid && true;
+        }
+      }
+      return valid;
+    },
+    save() {
+      if (this.validateQuestionsAndAnswer()) {
+        const assessmentQuestions = this.questions;
+        this.$emit("update-assessment-questions", assessmentQuestions);
+        const assessmentAnswers = this.answers;
+        this.$emit("update-assessment-answers", assessmentAnswers);
+        this.closeDialog();
+      } else {
+        this.errorSnackbar = true;
+      }
     }
   }
 };

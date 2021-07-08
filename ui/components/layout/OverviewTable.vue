@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-data-table
+      v-if="assessments.length > 0"
       :headers="headers"
       :items="assessments"
       :items-per-page="5"
@@ -12,12 +13,11 @@
           <v-divider class="mx-4" inset vertical></v-divider>
         </v-toolbar>
       </template>
-
       <template v-slot:item.details="{ item }">
         <v-btn @click.stop="viewDetails(item)">einsehen</v-btn>
       </template>
       <template v-slot:item.submit="{ item }">
-        <v-btn @click="submitAssessment(item)">
+        <v-btn @click="submitAssessment(item)" :disabled="item.state === state">
           einreichen
         </v-btn>
       </template>
@@ -26,18 +26,27 @@
       </template>
     </v-data-table>
     <details-dialog
+      v-if="detailsItem.assessment_id"
       :detailsDialog="detailsDialog"
       :detailsItem="detailsItem"
+      :questions="questions"
+      :answers="answers"
+      :documents="documents"
       @update-details-dialog="updateDetailsDialog"
     ></details-dialog>
     <submit-dialog
       :submitDialog="submitDialog"
       :detailsItem="detailsItem"
+      :questions="questions"
+      :answers="answers"
       @update-submit-dialog="updateSubmitDialog"
     ></submit-dialog>
     <assess-dialog
       :assessDialog="assessDialog"
       :detailsItem="detailsItem"
+      :questions="questions"
+      :answers="answers"
+      :documents="documents"
       @update-assess-dialog="updateAssessDialog"
     ></assess-dialog>
     <v-snackbar v-model="errorSnackbar">
@@ -56,6 +65,7 @@ import DetailsDialog from "../misc/DetailsDialog.vue";
 import SubmitDialog from "../misc/SubmitDialog.vue";
 import AssessDialog from "../misc/AssessDialog.vue";
 import { API_URL } from "../../env";
+import { IS_RATED } from "../../src/constants";
 export default {
   components: { DetailsDialog, SubmitDialog, AssessDialog },
   data: () => ({
@@ -63,6 +73,7 @@ export default {
     submitDialog: false,
     assessDialog: false,
     errorSnackbar: false,
+    state: IS_RATED,
     headers: [
       {
         text: "ID",
@@ -80,6 +91,9 @@ export default {
       { text: "Assessment", value: "assess" }
     ],
     assessments: [],
+    questions: [],
+    answers: [],
+    documents: [],
     detailsIndex: -1,
     detailsItem: {
       assessment_id: "",
@@ -106,22 +120,91 @@ export default {
       }
     },
 
-    viewDetails(item) {
+    async viewDetails(item) {
       this.detailsIndex = this.assessments.indexOf(item);
       this.detailsItem = Object.assign({}, item);
-      this.detailsDialog = true;
+      try {
+        const { questions } = await this.$axios.$get(
+          `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
+        );
+        this.questions = questions;
+
+        let answersCopy = [];
+        for await (const q of this.questions) {
+          const { answers } = await this.$axios.$get(
+            `${API_URL}/assessments/questions/answers/${q.question_id}`
+          );
+          answersCopy = answersCopy.concat(answers);
+        }
+        this.answers = answersCopy;
+
+        const { documents } = await this.$axios.$get(
+          `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
+        );
+        this.documents = documents;
+        this.detailsDialog = true;
+      } catch (error) {
+        console.error(error);
+        this.errorSnackbar = true;
+      }
     },
 
-    submitAssessment(item) {
+    async submitAssessment(item) {
       this.detailsIndex = this.assessments.indexOf(item);
       this.detailsItem = Object.assign({}, item);
-      this.submitDialog = true;
+      try {
+        const { questions } = await this.$axios.$get(
+          `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
+        );
+        this.questions = questions;
+
+        let answersCopy = [];
+        for await (const q of this.questions) {
+          const { answers } = await this.$axios.$get(
+            `${API_URL}/assessments/questions/answers/${q.question_id}`
+          );
+          answersCopy = answersCopy.concat(answers);
+        }
+        this.answers = answersCopy;
+
+        const { documents } = await this.$axios.$get(
+          `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
+        );
+        this.documents = documents;
+        this.submitDialog = true;
+      } catch (error) {
+        console.error(error);
+        this.errorSnackbar = true;
+      }
     },
 
-    assessAssessment(item) {
+    async assessAssessment(item) {
       this.detailsIndex = this.assessments.indexOf(item);
       this.detailsItem = Object.assign({}, item);
-      this.assessDialog = true;
+      try {
+        const { questions } = await this.$axios.$get(
+          `${API_URL}/assessments/questions/${this.detailsItem.assessment_id}`
+        );
+        this.questions = questions;
+
+        let answersCopy = [];
+        for await (const q of this.questions) {
+          const { answers } = await this.$axios.$get(
+            `${API_URL}/assessments/questions/answers/${q.question_id}`
+          );
+          answersCopy = answersCopy.concat(answers);
+        }
+        this.answers = answersCopy;
+
+        const { documents } = await this.$axios.$get(
+          `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
+        );
+        this.documents = documents;
+        this.assessDialog = true;
+      } catch (error) {
+        console.error(error);
+        this.errorSnackbar = true;
+      }
     },
 
     updateDetailsDialog(dialog) {
