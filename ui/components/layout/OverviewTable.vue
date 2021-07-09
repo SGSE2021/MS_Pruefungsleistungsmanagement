@@ -17,12 +17,19 @@
         <v-btn @click.stop="viewDetails(item)">einsehen</v-btn>
       </template>
       <template v-slot:item.submit="{ item }">
-        <v-btn @click="submitAssessment(item)" :disabled="item.state === state">
+        <v-btn
+          @click="submitAssessment(item)"
+          :disabled="item.state === isRated || item.state === isSubmitted"
+        >
           einreichen
         </v-btn>
       </template>
       <template v-slot:item.assess="{ item }">
-        <v-btn @click.stop="assessAssessment(item)">bewerten</v-btn>
+        <v-btn
+          @click.stop="assessAssessment(item)"
+          :disabled="item.state === isRated"
+          >bewerten</v-btn
+        >
       </template>
     </v-data-table>
     <details-dialog
@@ -68,8 +75,10 @@ import { API_URL } from "../../env";
 import {
   ASSESS_DIALOG,
   DETAILS_DIALOG,
-  IS_RATED,
-  SUBMIT_DIALOG
+  SUBMIT_DIALOG,
+  IS_CREATED,
+  IS_SUBMITTED,
+  IS_RATED
 } from "../../src/constants";
 export default {
   components: { DetailsDialog, SubmitDialog, AssessDialog },
@@ -78,7 +87,9 @@ export default {
     submitDialog: false,
     assessDialog: false,
     errorSnackbar: false,
-    state: IS_RATED,
+    isCreated: IS_CREATED,
+    isSubmitted: IS_SUBMITTED,
+    isRated: IS_RATED,
     headers: [
       {
         text: "ID",

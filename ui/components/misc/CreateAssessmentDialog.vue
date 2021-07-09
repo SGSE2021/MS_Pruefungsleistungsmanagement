@@ -221,6 +221,7 @@ export default {
           this.errorSnackbar = true;
         }
         this.closeDialog();
+        this.$router.go(0);
       }
     }
   }

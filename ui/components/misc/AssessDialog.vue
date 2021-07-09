@@ -157,6 +157,7 @@ export default {
           }
         );
         this.closeDialog();
+        this.$router.go(0);
       } catch (error) {
         console.error(error);
       }

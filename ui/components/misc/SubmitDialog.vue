@@ -71,6 +71,7 @@
 
 <script>
 import { API_URL } from "../../env";
+import { IS_SUBMITTED } from "../../src/constants";
 export default {
   components: {},
   props: ["submitDialog", "detailsItem", "questions", "answers"],
@@ -103,6 +104,17 @@ export default {
             doc_data: base64
           });
         }
+        console.log(this.detailsItem, IS_SUBMITTED);
+        await this.$axios.$put(
+          `${API_URL}/assessments/${this.detailsItem.assessment_id}`,
+          {
+            topic: this.detailsItem.topics,
+            state: IS_SUBMITTED,
+            is_rated: this.detailsItem.is_rated,
+            max_rating: this.detailsItem.max_rating,
+            rating: this.detailsItem.rating
+          }
+        );
         for await (const question of this.questions) {
           await this.$axios.$put(
             `${API_URL}/assessments/questions/question/${question.question_id}`,
@@ -124,6 +136,7 @@ export default {
           }
         }
         this.closeDialog();
+        this.$router.go(0);
       } catch (error) {
         console.error(error);
       }
