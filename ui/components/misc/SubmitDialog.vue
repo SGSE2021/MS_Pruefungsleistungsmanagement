@@ -104,7 +104,6 @@ export default {
             doc_data: base64
           });
         }
-        console.log(this.detailsItem, IS_SUBMITTED);
         await this.$axios.$put(
           `${API_URL}/assessments/${this.detailsItem.assessment_id}`,
           {
