@@ -28,6 +28,8 @@ class Assessment(Resource):
         Expect a JSON payload with the following format
         {
             "course_course_id": int,
+            "start_date": str,
+            "end_date": str,
             "topic": str,
             "state": str,
             "is_rated": bool,
@@ -35,7 +37,7 @@ class Assessment(Resource):
         }
         """
         data = request.get_json()
-        query = "INSERT INTO `assessment` (`course_course_id`, `topic`, `state`, `is_rated`, `max_rating`) VALUES (:course_course_id, :topic, :state, :is_rated, :max_rating)"
+        query = "INSERT INTO `assessment` (`course_course_id`, `topic`, `start_date`, `end_date`, `state`, `is_rated`, `max_rating`) VALUES (:course_course_id, :topic, :start_date, :end_date, :state, :is_rated, :max_rating)"
         last_row_id = "SELECT assessment_id FROM `assessment` ORDER BY `assessment_id` DESC LIMIT 1;"
         try:
 

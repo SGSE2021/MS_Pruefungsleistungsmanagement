@@ -19,7 +19,11 @@
       <template v-slot:item.submit="{ item }">
         <v-btn
           @click="submitAssessment(item)"
-          :disabled="item.state === isRated || item.state === isSubmitted"
+          :disabled="
+            item.state === isRated ||
+              item.state === isSubmitted ||
+              checkTimestamp(item.end_date)
+          "
         >
           einreichen
         </v-btn>
@@ -200,6 +204,18 @@ export default {
     },
     updateAssessDialog(dialog) {
       this.assessDialog = dialog;
+    },
+
+    checkTimestamp(timestamp) {
+      console.log(this.$moment(timestamp), this.$moment());
+      if (this.$moment(timestamp) < this.$moment()) {
+        console.log("1");
+        return true;
+      } else {
+        console.log("2");
+
+        return false;
+      }
     }
   }
 };

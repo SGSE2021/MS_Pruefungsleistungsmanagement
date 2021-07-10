@@ -57,11 +57,18 @@
                   <v-datetime-picker
                     label="Startzeit wählen"
                     v-model="startTime"
+                    :dateFormat="dateFormat"
+                    :timeFormat="timeFormat"
                   >
                   </v-datetime-picker>
                 </v-list-item>
                 <v-list-item>
-                  <v-datetime-picker label="Endzeit wählen" v-model="endTime">
+                  <v-datetime-picker
+                    label="Endzeit wählen"
+                    v-model="endTime"
+                    :dateFormat="dateFormat"
+                    :timeFormat="timeFormat"
+                  >
                   </v-datetime-picker>
                 </v-list-item>
               </client-only>
@@ -113,7 +120,12 @@
 <script>
 import CreateTasksDialog from "./CreateTasksDialog.vue";
 import { API_URL } from "../../env";
-import { IS_CREATED } from "../../src/constants";
+import {
+  IS_CREATED,
+  DATE_FORMAT,
+  TIME_FORMAT,
+  DATE_FORMAT_MOMENT
+} from "../../src/constants";
 export default {
   components: { CreateTasksDialog },
   props: ["createAssessmentDialog"],
@@ -132,7 +144,9 @@ export default {
     startTime: "",
     endTime: "",
     errorSnackbar: false,
-    missingSnackbar: false
+    missingSnackbar: false,
+    dateFormat: DATE_FORMAT,
+    timeFormat: TIME_FORMAT
   }),
   methods: {
     closeDialog() {
@@ -175,6 +189,12 @@ export default {
             {
               course_course_id: "1",
               topic: this.topic,
+              start_date: this.$moment(this.startTime).format(
+                `${DATE_FORMAT_MOMENT} ${TIME_FORMAT}`
+              ),
+              end_date: this.$moment(this.endTime).format(
+                `${DATE_FORMAT_MOMENT} ${TIME_FORMAT}`
+              ),
               state: IS_CREATED,
               is_rated: false,
               max_rating: this.maxRating
@@ -194,10 +214,8 @@ export default {
                   assessment_assessment_id: assessmentId
                 }
               );
-              console.log(question_id);
               const questionId = question_id[0].question_id;
               for await (const answer of this.assessmentAnswers) {
-                console.log(answer.question_question_id, question.question_id);
                 if (
                   answer.question_question_id === question.question_id &&
                   question.is_multiple_choice

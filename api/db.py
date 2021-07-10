@@ -8,7 +8,7 @@ class Db():
     def __init__(self):
         # Dev: mysql+pymysql://dbuser:dbpassword@db/assessment_db
         # Prod: mysql+pymysql://examsdb-user:h5qbbl8CEb@exams-mysql.support.svc.cluster.local:3306/examdb
-        db_url = "mysql+pymysql://examsdb-user:h5qbbl8CEb@exams-mysql.support.svc.cluster.local:3306/examdb"
+        db_url = "mysql+pymysql://dbuser:dbpassword@db/assessment_db"
 
         engine = create_engine(db_url)
         self.connection = engine.connect()
