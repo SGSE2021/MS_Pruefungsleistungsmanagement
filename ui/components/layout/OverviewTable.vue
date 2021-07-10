@@ -207,13 +207,9 @@ export default {
     },
 
     checkTimestamp(timestamp) {
-      console.log(this.$moment(timestamp), this.$moment());
       if (this.$moment(timestamp) < this.$moment()) {
-        console.log("1");
         return true;
       } else {
-        console.log("2");
-
         return false;
       }
     }
