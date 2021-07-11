@@ -49,7 +49,8 @@ export default {
     transpile: ["vue-agile"]
   },
 
-  static: {
-    prefix: false
+  router: {
+    base:
+      process.env.NODE_ENV === "development" ? process.env.BASE_URL : "/exams/"
   }
 };
