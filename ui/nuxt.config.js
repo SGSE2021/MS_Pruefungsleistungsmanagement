@@ -51,11 +51,9 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     extend(config, { isDev }) {
-      config.plugins.push(
-        new webpack.DefinePlugin({
-          STATIC_PATH: JSON.stringify(isDev ? "" : "/exams")
-        })
-      );
+      if (!isDev) {
+        config.output.publicPath = "./_nuxt/";
+      }
     },
     transpile: ["vue-agile"]
   }
