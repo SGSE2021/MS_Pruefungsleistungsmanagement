@@ -10,7 +10,7 @@ on:
   
 env:
   IMAGE_NAME: ms_exams
-  SERVICE_NAME: exams
+  SERVICE_NAME: exams-backend
   DOCKERFILE: ./api/Dockerfile
   MANIFESTFILE: manifests/exams-backend.yaml
 
