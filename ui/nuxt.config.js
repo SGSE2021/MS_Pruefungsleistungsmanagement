@@ -45,16 +45,11 @@ export default {
   },
 
   router: {
-    base: process.env.NODE_ENV === "development" ? "/" : "/exams"
+    base: process.env.NODE_ENV === "development" ? "/" : "/exams/"
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    extend(config, { isDev }) {
-      if (!isDev) {
-        config.output.publicPath = "./_nuxt/";
-      }
-    },
     transpile: ["vue-agile"]
   }
 };
