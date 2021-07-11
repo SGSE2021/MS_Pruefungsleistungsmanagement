@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
+import os
 
 from sqlalchemy import create_engine
 
@@ -8,7 +9,7 @@ class Db():
     def __init__(self):
         # Dev: mysql+pymysql://dbuser:dbpassword@db/assessment_db
         # Prod: mysql+pymysql://examsdb-user:h5qbbl8CEb@exams-mysql.support.svc.cluster.local:3306/examdb
-        db_url = "mysql+pymysql://dbuser:dbpassword@db/assessment_db"
+        db_url = os.getenv('DATABASE_URL')
 
         engine = create_engine(db_url)
         self.connection = engine.connect()
