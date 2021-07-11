@@ -49,8 +49,11 @@ export default {
     transpile: ["vue-agile"]
   },
 
-  router: {
-    base:
-      process.env.NODE_ENV === "development" ? process.env.BASE_URL : "/exams/"
+  builder: {
+    extend(config, { isDev }) {
+      if (!isDev) {
+        config.output.publicPath = "./_nuxt/";
+      }
+    }
   }
 };
