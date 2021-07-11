@@ -2,26 +2,31 @@
   <div class="text-center">
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon v-bind="attrs" v-on="on" x-large>mdi-account-circle</v-icon>
+        <div>
+          <v-icon v-bind="attrs" v-on="on" x-large>mdi-account-circle</v-icon
+          ><br />
+          {{ getFirstname() }} {{ getLastname() }}
+        </div>
       </template>
-      <v-list>
-        <v-list-item v-for="(item, index) in items" :key="index">
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
     </v-menu>
   </div>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    items: [
-      { title: "Click Me" },
-      { title: "Click Me" },
-      { title: "Click Me" },
-      { title: "Click Me 2" }
-    ]
-  })
+  props: ["user"],
+  data: () => ({}),
+  methods: {
+    getFirstname() {
+      if (this.user) {
+        return this.user.firstname && this.user.firstname;
+      }
+    },
+    getLastname() {
+      if (this.user) {
+        return this.user.lastname && this.user.lastname;
+      }
+    }
+  }
 };
 </script>

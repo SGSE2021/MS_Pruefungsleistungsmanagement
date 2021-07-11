@@ -10,3 +10,7 @@ export const DATE_FORMAT_MOMENT = "yyyy-MM-DD";
 
 export const DATE_FORMAT = "yyyy-MM-dd";
 export const TIME_FORMAT = "HH-mm-SS";
+
+export const STUDENT = 1;
+export const ADMINSTRATIVE = 2;
+export const LECTURER = 3;

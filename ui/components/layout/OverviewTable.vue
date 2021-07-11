@@ -16,7 +16,7 @@
       <template v-slot:item.details="{ item }">
         <v-btn @click.stop="viewDetails(item)">einsehen</v-btn>
       </template>
-      <template v-slot:item.submit="{ item }">
+      <template v-slot:item.submit="{ item }" v-if="user.role === studentRole">
         <v-btn
           @click="submitAssessment(item)"
           :disabled="
@@ -28,7 +28,7 @@
           einreichen
         </v-btn>
       </template>
-      <template v-slot:item.assess="{ item }">
+      <template v-slot:item.assess="{ item }" v-if="user.role === lecturerRole">
         <v-btn
           @click.stop="assessAssessment(item)"
           :disabled="item.state === isRated"
@@ -76,6 +76,7 @@ import DetailsDialog from "../misc/DetailsDialog.vue";
 import SubmitDialog from "../misc/SubmitDialog.vue";
 import AssessDialog from "../misc/AssessDialog.vue";
 import { API_URL } from "../../env";
+import { STUDENT, LECTURER, ADMINISTRATIVE } from "../../src/constants";
 import {
   ASSESS_DIALOG,
   DETAILS_DIALOG,
@@ -86,44 +87,55 @@ import {
 } from "../../src/constants";
 export default {
   components: { DetailsDialog, SubmitDialog, AssessDialog },
-  data: () => ({
-    detailsDialog: false,
-    submitDialog: false,
-    assessDialog: false,
-    errorSnackbar: false,
-    isCreated: IS_CREATED,
-    isSubmitted: IS_SUBMITTED,
-    isRated: IS_RATED,
-    headers: [
-      {
-        text: "ID",
-        align: "start",
-        sortable: false,
-        value: "assessment_id"
-      },
-      { text: "Thema/Bezeichnung", value: "topic" },
-      { text: "Kurs", value: "course_course_id" },
-      { text: "Startdatum", value: "start_date" },
-      { text: "Enddatum", value: "end_date" },
-      { text: "Status", value: "state" },
-      { text: "Details", value: "details" },
-      { text: "Abgabe", value: "submit" },
-      { text: "Assessment", value: "assess" }
-    ],
-    assessments: [],
-    questions: [],
-    answers: [],
-    documents: [],
-    detailsIndex: -1,
-    detailsItem: {
-      assessment_id: "",
-      topic: "",
-      course: "",
-      start_date: "",
-      end_date: "",
-      state: ""
+  data() {
+    return {
+      detailsDialog: false,
+      submitDialog: false,
+      assessDialog: false,
+      errorSnackbar: false,
+      isCreated: IS_CREATED,
+      isSubmitted: IS_SUBMITTED,
+      isRated: IS_RATED,
+      user: this.$store.state.user ?? { role: -1 },
+      studentRole: STUDENT,
+      lecturerRole: LECTURER,
+      administrativeRole: ADMINISTRATIVE,
+      headers: [
+        {
+          text: "ID",
+          align: "start",
+          sortable: false,
+          value: "assessment_id"
+        },
+        { text: "Thema/Bezeichnung", value: "topic" },
+        { text: "Kurs", value: "course_course_id" },
+        { text: "Startdatum", value: "start_date" },
+        { text: "Enddatum", value: "end_date" },
+        { text: "Status", value: "state" },
+        { text: "Details", value: "details" },
+        { text: "Abgabe", value: "submit" },
+        { text: "Assessment", value: "assess" }
+      ],
+      assessments: [],
+      questions: [],
+      answers: [],
+      documents: [],
+      detailsIndex: -1,
+      detailsItem: {
+        assessment_id: "",
+        topic: "",
+        course: "",
+        start_date: "",
+        end_date: "",
+        state: ""
+      }
+    };
+  },
+  mounted() {
+    if (this.user.role === -1) {
+      this.$router.push("/");
     }
-  }),
+  },
   created() {
     this.initialize();
   },
