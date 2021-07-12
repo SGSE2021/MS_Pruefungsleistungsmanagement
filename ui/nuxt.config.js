@@ -46,7 +46,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    publicPath: './exams/_nuxt/',
+    publicPath: "./exams/_nuxt/",
     transpile: ["vue-agile"]
   }
 };

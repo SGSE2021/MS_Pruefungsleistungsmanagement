@@ -119,7 +119,7 @@ export default {
       title: "ILIAS 2.0"
     };
   },
-  created() {
+  mounted() {
     this.initialize();
   },
   methods: {
