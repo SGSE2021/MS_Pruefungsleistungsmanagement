@@ -37,7 +37,7 @@
         </v-list-item>
 
         <v-list-item
-          @click="login()"
+          :href="getLoginURL()"
           router
           exact
           v-if="!isLoggedIn() && !isDev"
@@ -80,7 +80,7 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      user: getUserFromLocalStorage(),
+      user: this.$store.state.user,
       isDev: isDev(),
       items: [
         {
@@ -119,24 +119,26 @@ export default {
       title: "ILIAS 2.0"
     };
   },
-
+  created() {
+    this.initialize();
+  },
   methods: {
     ...mapActions({
       switchPersistanceState: "switchPersistanceState"
     }),
-    getLogStatus() {
-      return this.user !== null ? "Ausloggen" : "Einloggen";
+    initialize() {
+      if (getUserFromLocalStorage() !== null) {
+        this.switchPersistanceState("LOGIN");
+      }
     },
-    login() {
-      if (!DEV_ENV) {
-        if (this.user === null) {
-          this.$router.push(
-            "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login"
-          );
-        } else {
-          this.switchPersistanceState("LOGIN");
-          this.$router.go(0);
-        }
+    getLogStatus() {
+      return this.$store.state.user ? "Ausloggen" : "Einloggen";
+    },
+    getLoginURL() {
+      if (this.$store.state.user === null && !DEV_ENV) {
+        return "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login?returnUrl=%2Fsettings";
+      } else {
+        return "/";
       }
     },
     loginDev() {
