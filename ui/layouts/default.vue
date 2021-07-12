@@ -133,8 +133,12 @@ export default {
       switchPersistanceState: "switchPersistanceState"
     }),
     initialize() {
-      if (getUserFromLocalStorage() !== null) {
+      if (getUserFromLocalStorage().user !== null) {
         this.switchPersistanceState("LOGIN");
+        this.user = this.$store.state.user;
+      } else {
+        this.switchPersistanceState("LOGOUT");
+        this.user = this.$store.state.user;
       }
     },
     getLogStatus() {

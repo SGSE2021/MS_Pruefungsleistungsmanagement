@@ -12,5 +12,5 @@ export const DATE_FORMAT = "yyyy-MM-dd";
 export const TIME_FORMAT = "HH-mm-SS";
 
 export const STUDENT = 1;
-export const ADMINSTRATIVE = 2;
+export const ADMINISTRATIVE = 2;
 export const LECTURER = 3;
