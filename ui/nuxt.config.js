@@ -44,9 +44,12 @@ export default {
     }
   },
 
+  router: {
+    base: "/exams/"
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ["vue-agile"],
-    publicPath: "/exams/"
+    transpile: ["vue-agile"]
   }
 };
