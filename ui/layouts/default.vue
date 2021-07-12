@@ -52,6 +52,12 @@
             <v-list-item-title v-text="`Ausloggen`" />
           </v-list-item-content>
         </v-list-item>
+
+        <v-list-item @click="refresh()" router exact>
+          <v-list-item-content>
+            <v-list-item-title v-text="`Aktualisieren`" />
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
@@ -155,6 +161,9 @@ export default {
     },
     isLoggedIn() {
       return this.$store.state.user === null ? false : true;
+    },
+    refresh() {
+      this.$router.go(0);
     }
   }
 };
