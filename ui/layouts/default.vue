@@ -37,7 +37,7 @@
         </v-list-item>
 
         <v-list-item
-          :href="getLoginURL()"
+          @click="login()"
           router
           exact
           v-if="!isLoggedIn() && !isDev"
@@ -71,7 +71,7 @@
 <script>
 import UserMenu from "../components/layout/UserMenu.vue";
 import { DEV_ENV } from "../env";
-import { isDev } from "../src/helperFunctions";
+import { getUserFromLocalStorage, isDev } from "../src/helperFunctions";
 import { mapActions } from "vuex";
 export default {
   components: { UserMenu },
@@ -80,7 +80,7 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      user: this.$store.state.user,
+      user: getUserFromLocalStorage(),
       isDev: isDev(),
       items: [
         {
@@ -119,18 +119,24 @@ export default {
       title: "ILIAS 2.0"
     };
   },
+
   methods: {
     ...mapActions({
       switchPersistanceState: "switchPersistanceState"
     }),
     getLogStatus() {
-      return this.$store.state.user ? "Ausloggen" : "Einloggen";
+      return this.user !== null ? "Ausloggen" : "Einloggen";
     },
-    getLoginURL() {
-      if (this.$store.state.user === null && !DEV_ENV) {
-        return "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login?returnUrl=%2Fsettings";
-      } else {
-        return "/";
+    login() {
+      if (!DEV_ENV) {
+        if (this.user === null) {
+          this.$router.push(
+            "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login"
+          );
+        } else {
+          this.switchPersistanceState("LOGIN");
+          this.$router.go(0);
+        }
       }
     },
     loginDev() {
