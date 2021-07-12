@@ -45,7 +45,7 @@ export default {
   },
 
   router: {
-    base: "/exams/"
+    base: "/exams"
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
