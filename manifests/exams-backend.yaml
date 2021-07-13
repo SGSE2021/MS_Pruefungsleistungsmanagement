@@ -18,10 +18,10 @@ spec:
         app: exams-backend
     spec:
       nodeSelector:
-        "beta.kubernetes.io/os": linux 
+        "beta.kubernetes.io/os": linux
       containers:
       - name: exams-backend
-        image: sgse2021cr.azurecr.io/ms_exams:latest
+        image: sgse2021containerregistry.azurecr.io/ms_exams:latest
         env: 
         - name: DATABASE_URL 
           valueFrom: 
@@ -36,7 +36,6 @@ spec:
         ports:
         - containerPort: 9000
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

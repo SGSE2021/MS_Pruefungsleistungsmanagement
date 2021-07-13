@@ -8,8 +8,6 @@ WORKDIR /usr/src/nuxt-app
 RUN apk update && apk upgrade
 RUN apk add git
 
-RUN npm config set strict-ssl=false
-
 # copy the app, note .dockerignore
 COPY . /usr/src/nuxt-app/
 RUN npm install

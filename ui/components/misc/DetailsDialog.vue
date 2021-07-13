@@ -12,7 +12,6 @@
                 <v-col cols="12" xs="12">
                   <single-assessment-table
                     :detailsItem="detailsItem"
-                    :courses="courses"
                   ></single-assessment-table>
                 </v-col>
                 <v-col cols="12" xs="12" v-if="detailsItem.is_rated">
@@ -73,14 +72,7 @@ import SingleAssessmentTable from "../layout/SingleAssessmentTable.vue";
 
 export default {
   components: { SingleAssessmentTable },
-  props: [
-    "detailsDialog",
-    "detailsItem",
-    "questions",
-    "answers",
-    "documents",
-    "courses"
-  ],
+  props: ["detailsDialog", "detailsItem", "questions", "answers", "documents"],
   data: () => ({}),
   methods: {
     closeDialog() {

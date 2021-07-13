@@ -104,14 +104,21 @@ export default {
             doc_data: base64
           });
         }
+        console.log(
+          this.detailsItem.topic,
+          IS_SUBMITTED,
+          this.detailsItem.is_rated,
+          this.detailsItem.max_rating,
+          this.detailsItem.rating
+        );
         await this.$axios.$put(
           `${API_URL}/assessments/${this.detailsItem.assessment_id}`,
           {
-            topic: this.detailsItem.topics,
+            topic: this.detailsItem.topic,
             state: IS_SUBMITTED,
             is_rated: this.detailsItem.is_rated,
             max_rating: this.detailsItem.max_rating,
-            rating: this.detailsItem.rating
+            rating: 0
           }
         );
         for await (const question of this.questions) {

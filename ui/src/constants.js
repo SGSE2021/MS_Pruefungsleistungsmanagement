@@ -15,9 +15,4 @@ export const STUDENT = 1;
 export const ADMINISTRATIVE = 2;
 export const LECTURER = 3;
 
-export const LOGIN_ROUTE =
-  "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login";
-export const LOGOUT_ROUTE =
-  "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/logout";
-export const OVERVIEW_ROUTE =
-  "https://sgse2021-ilias.westeurope.cloudapp.azure.com/exams/overview";
+export const CURRENT_USER_ROLE = 3;

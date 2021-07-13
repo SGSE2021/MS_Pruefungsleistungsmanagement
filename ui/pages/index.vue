@@ -23,8 +23,8 @@
           >
             Zu der Übersicht
           </v-btn>
-          <v-btn v-if="!isLoggedIn" color="primary" nuxt @click="login()">
-            Anmelden
+          <v-btn v-if="!isLoggedIn" color="primary" nuxt disabled>
+            Bitte melden Sie sich an
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -35,9 +35,6 @@
 <script>
 import Logo from "~/components/Logo.vue";
 import VuetifyLogo from "~/components/VuetifyLogo.vue";
-import { LOGIN_ROUTE, OVERVIEW_ROUTE } from "../src/constants";
-import { getUserFromLocalStorage } from "../src/helperFunctions";
-
 export default {
   components: {
     Logo,
@@ -53,13 +50,11 @@ export default {
   },
   methods: {
     checkLogStatus() {
-      return !!getUserFromLocalStorage();
+      return this.$store.state.user !== null;
     },
-    login() {
-      window.location.href = LOGIN_ROUTE;
-    },
+
     redirectToOverview() {
-      window.location.href = OVERVIEW_ROUTE;
+      this.$router.push("/overview");
     }
   }
 };

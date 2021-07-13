@@ -142,10 +142,15 @@ export default {
     assessmentSwitch: true,
     assessmentQuestions: [],
     assessmentAnswers: [],
-    topic: "",
-    maxRating: 0,
     courses: [],
     selectedCourseId: undefined,
+    topic: "",
+    maxRating: 0,
+    courses: [
+      "Methoden des Maschinellen Lernens",
+      "Software Engineering",
+      "Data Mining"
+    ],
     startTime: "",
     endTime: "",
     errorSnackbar: false,

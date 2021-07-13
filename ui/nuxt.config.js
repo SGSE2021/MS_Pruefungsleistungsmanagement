@@ -4,7 +4,7 @@ export default {
     titleTemplate: "%s - ILIAS 2.0",
     title: "Prüfungsleistungsmanagement",
     htmlAttrs: {
-      lang: "en"
+      lang: "de"
     },
     meta: [
       { charset: "utf-8" },
@@ -18,7 +18,10 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [{ src: "~/plugins/vuetify-datetime-picker.js", mode: "client" }],
+  plugins: [
+    { src: "~/plugins/vuetify-datetime-picker.js", mode: "client" },
+    { src: "~/plugins/vuex-persistedstate.js", mode: "client" }
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -43,7 +46,6 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    publicPath: "./exams/_nuxt/",
     transpile: ["vue-agile"]
   }
 };

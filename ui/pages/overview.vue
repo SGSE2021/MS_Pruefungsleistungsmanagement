@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="user !== null">
+  <v-container>
     <h1>Abgaben, Tests & Assessments</h1>
     <v-divider class="divider"></v-divider>
     <v-row>
@@ -14,7 +14,7 @@
         </v-layout>
       </v-col>
     </v-row>
-    <overview-table :user="user"></overview-table>
+    <overview-table></overview-table>
     <create-assessment-dialog
       :createAssessmentDialog="createAssessmentDialog"
       @update-create-assessment-dialog="updateCreateAssessmentDialog"
@@ -26,21 +26,18 @@
 import OverviewTable from "../components/layout/OverviewTable.vue";
 import CreateAssessmentDialog from "../components/misc/CreateAssessmentDialog.vue";
 import { STUDENT, LECTURER, ADMINISTRATIVE } from "../src/constants";
-import { getUserFromLocalStorage } from "../src/helperFunctions";
 export default {
   components: { OverviewTable, CreateAssessmentDialog },
   data() {
     return {
       createAssessmentDialog: false,
-      user: { role: -1 }
+      user: this.$store.state.user ?? { role: -1 },
+      lecturerRole: LECTURER
     };
   },
   mounted() {
-    if (this.user?.role === -1) {
-      this.user = getUserFromLocalStorage();
-      if (this.user === null) {
-        this.$router.push("/");
-      }
+    if (this.user.role === -1) {
+      this.$router.push("/");
     }
   },
   methods: {
@@ -51,15 +48,13 @@ export default {
       this.createAssessmentDialog = dialog;
     },
     getCurrentRole() {
-      if (this.user) {
-        switch (this.user.role) {
-          case STUDENT:
-            return "Studierende";
-          case LECTURER:
-            return "Lehrende";
-          case ADMINISTRATIVE:
-            return "Administrative";
-        }
+      switch (this.user.role) {
+        case STUDENT:
+          return "Studierende";
+        case LECTURER:
+          return "Lehrende";
+        case ADMINISTRATIVE:
+          return "Administrative";
       }
     }
   }
