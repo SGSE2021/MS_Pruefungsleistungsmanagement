@@ -11,7 +11,6 @@
         <v-icon x-large>mdi-school</v-icon>
         <h3 class="logo__text">ILIAS 2.0</h3>
       </v-layout>
-
       <v-list>
         <v-list-item
           v-for="(item, i) in items"
