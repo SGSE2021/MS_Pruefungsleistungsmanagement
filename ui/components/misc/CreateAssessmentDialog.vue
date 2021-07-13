@@ -50,7 +50,15 @@
                 ></v-text-field>
               </v-list-item>
               <v-list-item>
-                <v-select :items="courses" label="Kurs" outlined></v-select>
+                <v-select
+                  v-model="courseSelect"
+                  :items="courses"
+                  item-text="name"
+                  return-object
+                  v-on:change="changeCourseSelection"
+                  label="Kurs"
+                  outlined
+                ></v-select>
               </v-list-item>
               <client-only placeholder="Loading...">
                 <v-list-item>
@@ -136,11 +144,8 @@ export default {
     assessmentAnswers: [],
     topic: "",
     maxRating: 0,
-    courses: [
-      "Methoden des Maschinellen Lernens",
-      "Software Engineering",
-      "Data Mining"
-    ],
+    courses: [],
+    selectedCourseId: undefined,
     startTime: "",
     endTime: "",
     errorSnackbar: false,
@@ -148,7 +153,21 @@ export default {
     dateFormat: DATE_FORMAT,
     timeFormat: TIME_FORMAT
   }),
+  created() {
+    this.initialize();
+  },
   methods: {
+    async initialize() {
+      try {
+        const courses = await this.$axios.$get(
+          `https://sgse2021-ilias.westeurope.cloudapp.azure.com/courses-api/courses`
+        );
+        this.courses = courses;
+      } catch (error) {
+        console.error(error);
+        this.errorSnackbar = true;
+      }
+    },
     closeDialog() {
       const closedDialog = false;
       this.$emit("update-create-assessment-dialog", closedDialog);
@@ -173,7 +192,8 @@ export default {
         this.startTime === undefined ||
         this.startTime === "" ||
         this.endTime === undefined ||
-        this.endTime === ""
+        this.endTime === "" ||
+        this.selectedCourseId === undefined
       ) {
         valid = false;
       } else {
@@ -187,7 +207,7 @@ export default {
           const { assessment_id } = await this.$axios.$post(
             `${API_URL}/assessments`,
             {
-              course_course_id: "1",
+              course_course_id: this.selectedCourseId,
               topic: this.topic,
               start_date: this.$moment(this.startTime).format(
                 `${DATE_FORMAT_MOMENT} ${TIME_FORMAT}`
@@ -241,6 +261,9 @@ export default {
         this.closeDialog();
         this.$router.go(0);
       }
+    },
+    changeCourseSelection(sel) {
+      this.selectedCourseId = Number(sel.id);
     }
   }
 };

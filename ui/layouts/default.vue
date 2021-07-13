@@ -52,12 +52,6 @@
             <v-list-item-title v-text="`Ausloggen`" />
           </v-list-item-content>
         </v-list-item>
-
-        <v-list-item @click="refresh()" router exact>
-          <v-list-item-content>
-            <v-list-item-title v-text="`Aktualisieren`" />
-          </v-list-item-content>
-        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
@@ -77,8 +71,8 @@
 <script>
 import UserMenu from "../components/layout/UserMenu.vue";
 import { DEV_ENV } from "../env";
+import { LOGIN_ROUTE, LOGOUT_ROUTE } from "../src/constants";
 import { getUserFromLocalStorage, isDev } from "../src/helperFunctions";
-import { mapActions } from "vuex";
 export default {
   components: { UserMenu },
   data() {
@@ -86,32 +80,45 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      user: this.$store.state.user,
+      user: null,
       isDev: isDev(),
       items: [
         {
           title: "Startseite",
-          to: "/"
+          to: "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/"
         },
+
         {
-          title: "Mail",
-          to: "/"
+          title: "Nachrichten",
+          to: "https://sgse2021-ilias.westeurope.cloudapp.azure.com/messages/"
         },
         {
           title: "Kurse",
-          to: "/"
+          to: "https://sgse2021-ilias.westeurope.cloudapp.azure.com/courses/"
         },
         {
-          title: "Stundenplan",
-          to: "/"
+          title: "Termine",
+          to:
+            "https://sgse2021-ilias.westeurope.cloudapp.azure.com/courses/appointments"
         },
         {
           title: "Prüfungen",
-          to: "/"
+          to: "https://sgse2021-ilias.westeurope.cloudapp.azure.com/exams/"
         },
         {
+          title: "Studierende",
+          to:
+            "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/students"
+        },
+        {
+          title: "Lehrende",
+          to:
+            "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/lecturers"
+        },
+
+        {
           title: "Raumbuchung",
-          to: "/"
+          to: "https://sgse2021-ilias.westeurope.cloudapp.azure.com/booking/"
         }
       ],
       accountMenuItems: [
@@ -129,45 +136,44 @@ export default {
     this.initialize();
   },
   methods: {
-    ...mapActions({
-      switchPersistanceState: "switchPersistanceState"
-    }),
     initialize() {
-      if (getUserFromLocalStorage().user !== null) {
-        this.switchPersistanceState("LOGIN");
-        this.user = this.$store.state.user;
+      if (getUserFromLocalStorage() !== null) {
+        if (Object.keys(getUserFromLocalStorage()).length > 0) {
+          this.user = getUserFromLocalStorage();
+        }
       } else {
-        this.switchPersistanceState("LOGOUT");
-        this.user = this.$store.state.user;
+        this.user = null;
       }
     },
     getLogStatus() {
-      return this.$store.state.user ? "Ausloggen" : "Einloggen";
+      return this.user ? "Ausloggen" : "Einloggen";
     },
     getLoginURL() {
-      if (this.$store.state.user === null && !DEV_ENV) {
-        return "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login?returnUrl=%2Fsettings";
+      if (this.user === null && !DEV_ENV) {
+        return LOGIN_ROUTE;
       } else {
         return "/";
       }
     },
     loginDev() {
-      if (this.$store.state.user === null && DEV_ENV) {
-        this.switchPersistanceState("LOGIN");
-        this.$router.go(0);
+      if (this.user === null && DEV_ENV) {
+        localStorage.setItem(
+          "current-user",
+          JSON.stringify({
+            uid: "Hq8GJM8enJM4lwyVbmKSnoKA4Ox2",
+            firstname: "Joyce",
+            lastname: "Rafflenbeul",
+            role: 1
+          })
+        );
+        this.user = getUserFromLocalStorage();
       }
     },
     logout() {
-      if (this.$store.state.user !== null) {
-        this.switchPersistanceState("LOGOUT");
-        this.$router.go(0);
-      }
+      window.location.href = LOGOUT_ROUTE;
     },
     isLoggedIn() {
-      return this.$store.state.user === null ? false : true;
-    },
-    refresh() {
-      this.$router.go(0);
+      return this.user === null ? false : true;
     }
   }
 };

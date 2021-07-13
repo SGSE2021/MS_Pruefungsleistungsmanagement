@@ -43,6 +43,7 @@
       :questions="questions"
       :answers="answers"
       :documents="documents"
+      :courses="courses"
       @update-details-dialog="updateDetailsDialog"
     ></details-dialog>
     <submit-dialog
@@ -87,6 +88,7 @@ import {
 } from "../../src/constants";
 export default {
   components: { DetailsDialog, SubmitDialog, AssessDialog },
+  props: ["user"],
   data() {
     return {
       detailsDialog: false,
@@ -96,7 +98,6 @@ export default {
       isCreated: IS_CREATED,
       isSubmitted: IS_SUBMITTED,
       isRated: IS_RATED,
-      user: this.$store.state.user ?? { role: -1 },
       studentRole: STUDENT,
       lecturerRole: LECTURER,
       administrativeRole: ADMINISTRATIVE,
@@ -120,6 +121,7 @@ export default {
       questions: [],
       answers: [],
       documents: [],
+      courses: [],
       detailsIndex: -1,
       detailsItem: {
         assessment_id: "",
@@ -130,11 +132,6 @@ export default {
         state: ""
       }
     };
-  },
-  mounted() {
-    if (this.user.role === -1) {
-      this.$router.push("/");
-    }
   },
   created() {
     this.initialize();
@@ -172,6 +169,12 @@ export default {
           `${API_URL}/assessments/documents/${this.detailsItem.assessment_id}`
         );
         this.documents = documents;
+
+        const courses = await this.$axios.$get(
+          `https://sgse2021-ilias.westeurope.cloudapp.azure.com/courses-api/courses`
+        );
+        this.courses = courses;
+
         switch (dialogType) {
           case DETAILS_DIALOG:
             this.detailsDialog = true;
