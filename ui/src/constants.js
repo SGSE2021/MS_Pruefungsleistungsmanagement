@@ -19,3 +19,5 @@ export const LOGIN_ROUTE =
   "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/login";
 export const LOGOUT_ROUTE =
   "https://sgse2021-ilias.westeurope.cloudapp.azure.com/users/logout";
+export const OVERVIEW_ROUTE =
+  "https://sgse2021-ilias.westeurope.cloudapp.azure.com/exams/overview";
